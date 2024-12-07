@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Alarm Clock</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="clock-container">
+        <div class="clock">
+          <div class="hour-hand"></div>
+          <div class="minute-hand"></div>
+          <div class="second-hand"></div>
+          <div class="center-dot"></div>
+        </div>
+      </div>
+      <p>Current Time: <span id="currentTime"></span></p>
+
+      <input type="time" id="alarmTime" />
+      <button onclick="setAlarm();">Set Alarm</button>
+      <button onclick="alarmSound.pause();">Stop Alarm</button>
+      <button onclick="resetAlarm();">Reset</button>
+    </div>
+
+    <script type="text/javascript">
+      function currentTime() {
+        var date = new Date();
+        var now = date.toLocaleString("en-IN", {
+          hour12: true,
+          timeZone: "Asia/Kolkata",
+        });
+        document.getElementById("currentTime").innerHTML = now;
+
+        updateClockHands(date);
+      }
+
+      function updateClockHands(date) {
+        const hours = date.getHours() % 12;
+        const minutes = date.getMinutes();
+        const seconds = date.getSeconds();
+
+        const hourHand = document.querySelector(".hour-hand");
+        const minuteHand = document.querySelector(".minute-hand");
+        const secondHand = document.querySelector(".second-hand");
+
+        hourHand.style.transform = `rotate(${hours * 30 + minutes / 2}deg)`;
+        minuteHand.style.transform = `rotate(${minutes * 6}deg)`;
+        secondHand.style.transform = `rotate(${seconds * 6}deg)`;
+      }
+
+      setInterval(currentTime, 1000);
+
+      var alarmSound = new Audio("digital-alarm-clock.mp3");
+      var alarmTimeout;
+
+      function setAlarm() {
+        var alarmTime = document.getElementById("alarmTime").value;
+        var now = new Date();
+        var alarm = new Date(now.toDateString() + " " + alarmTime);
+
+        var timeRemaining = alarm - now;
+        if (timeRemaining >= 0) {
+          alarmTimeout = setTimeout(playAlarm, timeRemaining);
+          document.getElementById("alarmTime").disabled = true;
+        }
+      }
+
+      function playAlarm() {
+        alarmSound.play();
+        document.getElementById("alarmTime").disabled = false;
+      }
+
+      function stopAlarm() {
+        alarmSound.pause();
+        alarmSound.currentTime = 0; // Reset the sound to the start
+      }
+
+      function resetAlarm() {
+        clearTimeout(alarmTimeout);
+        stopAlarm();
+        document.getElementById("alarmTime").value = "";
+        document.getElementById("alarmTime").disabled = false;
+      }
+    </script>
+  </body>
+</html>
